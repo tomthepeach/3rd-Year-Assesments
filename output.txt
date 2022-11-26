@@ -1,0 +1,141 @@
+Umpire: 'love-all!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   0    -    0
+
+Umpire: 'love-fifteen!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   15    -    0
+
+Umpire: 'love-thirty!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   30    -    0
+
+Umpire: 'thirty-fifteen!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   30    -    15
+
+Umpire: 'thirty-all!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   30    -    30
+
+Umpire: 'thirty-forty!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   40    -    30
+
+Umpire: 'Deuce!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   40    -    40
+
+Umpire: 'Advantage Laybes!'
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+         -    adv
+
+Umpire: 'Game over, Laybes wins!'
+
+Score reset
+
+Umpire: 'love-all!'
+
+Score:
+Player 1:   Player 2:
+(Steve)  *(Laybes)
+   0    -    0
+
+Umpire: 'fifteen-love!'
+
+Score:
+Player 1:   Player 2:
+(Steve)  *(Laybes)
+   0    -    15
+
+Umpire: 'thirty-love!'
+
+Score:
+Player 1:   Player 2:
+(Steve)  *(Laybes)
+   0    -    30
+
+Umpire: 'fifteen-thirty!'
+
+Score:
+Player 1:   Player 2:
+(Steve)  *(Laybes)
+   15    -    30
+
+Umpire: 'thirty-all!'
+
+Score:
+Player 1:   Player 2:
+(Steve)  *(Laybes)
+   30    -    30
+
+Umpire: 'forty-thirty!'
+
+Score:
+Player 1:   Player 2:
+(Steve)  *(Laybes)
+   40    -    30
+
+Umpire: 'Game over, Steve wins!'
+
+Score reset
+
+Umpire: 'love-all!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   0    -    0
+
+Umpire: 'love-fifteen!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   15    -    0
+
+Umpire: 'love-thirty!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   30    -    0
+
+Umpire: 'love-forty!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   40    -    0
+
+Umpire: 'forty-fifteen!'
+
+Score:
+Player 1:   Player 2:
+(Steve)*  (Laybes)
+   40    -    15
+
+Umpire: 'Game over, Steve wins!'
