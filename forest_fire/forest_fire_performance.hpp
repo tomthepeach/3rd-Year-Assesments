@@ -19,11 +19,11 @@ bool forest_fire(int N, double p, int &steps,  int Nthreads, char wind_direction
 	note: we could have generalised this to be a single 3 dimensional array/vector, with the 3rd index over time
 	*/ 
 
-	vector<vector<int>> grid_old_master;
+	vector<vector<int>> grid_old;
 	// randomly fill the initial grid with live trees, using probability p
 	for (unsigned int i=0; i<N; i++)
 	{
-		grid_old_master.push_back(vector<int>());
+		grid_old.push_back(vector<int>());
 
 		for (unsigned int j=0;j<N;j++)
 		{
@@ -32,15 +32,15 @@ bool forest_fire(int N, double p, int &steps,  int Nthreads, char wind_direction
 	    	double rn = ((float)rand()/(float)(RAND_MAX));
 	
 			// if the random number is less than our probability p, we fill the site with a tree
-	    	if (rn <= p) grid_old_master[i].push_back(1);
+	    	if (rn <= p) grid_old[i].push_back(1);
 
 	    	// otherwise, the site remains empty
-	    	else grid_old_master[i].push_back(0);
+	    	else grid_old[i].push_back(0);
 		}
 	}
 
 	// set the top row of trees on fire
-	for (unsigned int i=0; i<N; i++) if (grid_old_master[0][i] == 1) grid_old_master[0][i] = 2;
+	for (unsigned int i=0; i<N; i++) if (grid_old[0][i] == 1) grid_old[0][i] = 2;
 
 	// initialise the new grid to an empty array
 	vector<vector<int>> grid_new;
@@ -70,14 +70,14 @@ bool forest_fire(int N, double p, int &steps,  int Nthreads, char wind_direction
 		// therefore we do not need to be explicit about any of the variables
 		// loop over grid points
 
-		#pragma omp parallel for num_threads(Nthreads)
+		#pragma omp parallel for num_threads(Nthreads) reduction(||:burning) 
 		for (unsigned int i=0; i<N; i++)
 		{
 			for (unsigned int j=0; j<N; j++)
 			{
-				// intialise local version of grid_old and to avoid race conditions
-				//this should use more memory but the old version barely used any and hopefully this should run faster
-				vector<vector<int>> grid_old(grid_old_master);
+				// // intialise local version of grid_old and to avoid race conditions
+				// //this should use more memory but the old version barely used any and hopefully this should run faster
+				// vector<vector<int>> grid_old(grid_old);
 
 		    	// first check if this is a previously burning tree, which should change from burning (2) to burnt (3)
 		    	// note: this operation depends only on the tree itself, i.e. the data at this grid point only
@@ -131,11 +131,11 @@ bool forest_fire(int N, double p, int &steps,  int Nthreads, char wind_direction
 		t++;
 	
 		// the current grid will become the old grid in the next step
-		grid_old_master = grid_new;
+		grid_old = grid_new;
 	}
 
 	bool bottom_reached = false;
-	for (unsigned int i=0; i<N; i++) if (grid_old_master[N-1][i] == 3) bottom_reached = true;
+	for (unsigned int i=0; i<N; i++) if (grid_old[N-1][i] == 3) bottom_reached = true;
 	steps = t;
 	return bottom_reached;	
 }

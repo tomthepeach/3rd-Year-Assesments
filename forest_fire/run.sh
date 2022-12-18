@@ -13,7 +13,7 @@ g++ -std=c++17 -fopenmp -O2 -o ff-per-omp forest_fire_performance.cpp
 #SBATCH --array=1-5
 
 export SEED="${SLURM_ARRAY_TASK_ID}"
-export WIND=S
+export WIND=S.
 
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
 srun ./ff-per-omp
