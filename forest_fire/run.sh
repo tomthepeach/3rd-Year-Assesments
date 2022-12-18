@@ -1,7 +1,7 @@
 #!/bin/bash
 
 module load intel/2020-u4
-g++ -std=c++17 -fopenmp -O2 -o ff-omp ff-omp.cpp
+g++ -std=c++17 -fopenmp -O2 -o ff-per-omp forest_fire_performance.cpp
 
 
 #SBATCH --job-name= ff-omp
@@ -13,7 +13,7 @@ g++ -std=c++17 -fopenmp -O2 -o ff-omp ff-omp.cpp
 #SBATCH --array=1-5
 
 export SEED="${SLURM_ARRAY_TASK_ID}"
-export WIND=1
+export WIND=S
 
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK}"
-srun ./ff-omp
+srun ./ff-per-omp
