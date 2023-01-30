@@ -4,7 +4,7 @@
 #include <string>
 #include <chrono>
 
-#include "forest_fire_performance.hpp"
+#include "forest_fire.hpp"
 
 using std::cout, std::endl, std::getenv, std::ofstream, std::string, std::stoi;
 
@@ -14,34 +14,37 @@ int main()
 {
 	auto start = std::chrono::high_resolution_clock::now();
 	// initialise the random number generator using a fixed seed for reproducibility
-	string strseed = getenv("SEED");
-	// string strseed = "1"; // for testing
-	int intseed = stoi(strseed);
-	srand(intseed);
-	char wind_direction = getenv("WIND")[0];
+	char wind_direction ='0';
 	ofstream output;
-	string filename =  strseed + "_" + wind_direction + "_output.csv";
+	string filename = "per_output.csv";
     output.open("per_data/" +filename);
-	output << "n,p,n_steps,time,bottom_reached,n_threads\n";
+	output << "n_threads,iteration,time\n";
 
-	
-	for (int threads=1; threads <= omp_get_max_threads(); threads++)
+	for (int threads=2; threads <= omp_get_max_threads(); threads++)
 	{
 
-		#pragma omp parallel for num_threads(threads) 
-		for (int N=1; N<=100; N++) 
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(threads)
+		for (int reps = 0; reps < 100; reps++)
 		{
-			for(auto p=0.1; p<1.0; p+=0.1)
+			auto startTime = omp_get_wtime();
+			for (int N=1; N<=100; N++) 
 			{
-				auto startTime = omp_get_wtime();
-				int nsteps;
-				bool bottom_reached = forest_fire(N, p, nsteps, wind_direction, threads);
-				auto finishTime = omp_get_wtime();
+				for(auto p=0.1; p<1.0; p+=0.1)
+				{
+					int nsteps;
+					bool bottom_reached = forest_fire(N, p, nsteps, wind_direction, threads);
 
-				double time_elapsed = (finishTime-startTime);
-				output << N  <<','<< p <<','<< nsteps <<','<< time_elapsed <<','<< bottom_reached << ',' <<threads <<"\n";
+				}
+			}
+			auto finishTime = omp_get_wtime();
+			double time_elapsed = (finishTime-startTime);
+			#pragma omp critical
+			{
+				output <<threads << ','  << reps << ',' << time_elapsed <<"\n";
 			}
 		}
+
+
 
 	}
 	output.close();
