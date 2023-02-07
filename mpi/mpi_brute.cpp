@@ -1,10 +1,12 @@
 #include <vector>
-// #include <mpi.h>
+#include <mpi.h>
 #include <stdlib.h>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
+#include <numeric>
 
-using std::vector, std::cout, std::endl, std::ifstream, std::string;
+using std::vector, std::cout, std::endl, std::ifstream, std::string, std::min, std::max, std::accumulate;
 
 
 // I'm aware that some of you are uncertain about how the MPI implementation should work for the assessed exercise, 
@@ -68,21 +70,35 @@ vector< vector<double> > read_xyz_file(string filename, int& N, double& L)
 	
 }
 
-vector<int> neighbors_bruteforce(int N, double rc, vector< vector<double> > positions)
+double calc_r2 (vector<double> v1, vector<double> v2)
+{
+			double dx = v1[0] - v2[0];
+			double dy = v1[1] - v2[1];
+			double dz = v1[2] - v2[2];
+			
+			// compute the distance
+			return dx*dx + dy*dy + dz*dz;
+}
+
+
+void neighbor_stats(vector<int> neighbors, int& max, int& min, double &avg)
+{
+	max = *max_element(neighbors.begin(), neighbors.end());
+	min = *min_element(neighbors.begin(), neighbors.end());
+	avg = accumulate(neighbors.begin(), neighbors.end(), 0.0) / neighbors.size();
+}
+
+
+vector<int> neighbors_bruteforce(int N, double rc, vector< vector<double> > positions, int iproc, int nproc)
 {
 	vector<int> neighbors(N, 0);
 
-	for (int i=0; i<N; i++)
+	for (int i=0+iproc; i<N; i+=nproc)
 	{
 		for (int j=i+1; j<N; j++)
 		{
 			// compute the distance between the two particles
-			double dx = positions[i][0] - positions[j][0];
-			double dy = positions[i][1] - positions[j][1];
-			double dz = positions[i][2] - positions[j][2];
-			
-			// compute the distance
-			double r2 = dx*dx + dy*dy + dz*dz;
+			double r2 = calc_r2(positions[i], positions[j]);
 			
 			// check if the distance is less than the cutoff
 			if (r2 < rc*rc)
@@ -96,21 +112,14 @@ vector<int> neighbors_bruteforce(int N, double rc, vector< vector<double> > posi
 	return neighbors;
 }
 
-void neigbors_cellist()
-{
-
-}
 
 
-int main(int argc, char **argv)
+int main()
 {
 	// read in the xyz coordinates
 	int N;
 	double L;
-	vector< vector<double> > positions = read_xyz_file("argon120.xyz", N, L);
-
-	// initialise MPI
-	MPI_Init(&argc, &argv);
+	MPI_Init(nullptr, nullptr);
 
 	// Get the number of processes in MPI_COMM_WORLD
 	int nproc;
@@ -119,18 +128,37 @@ int main(int argc, char **argv)
 	// get the rank of this process in MPI_COMM_WORLD
 	int iproc;
 	MPI_Comm_rank(MPI_COMM_WORLD, &iproc);
-	
 
-	vector<int> neighbors = neighbors_bruteforce(N, L, 8.0, positions);
+	vector< vector<double> > positions;
+
+	if (iproc == 0)
+	{
+		cout << "Running on " << nproc << " processes" << endl;
+		cout << "Reading in xyz coordinates" << endl;
+		positions = read_xyz_file("argon120.xyz", N, L);
+		MPI_Bcast(positions.data(), N, MPI_INT, 0, MPI_COMM_WORLD);
+	}
+
+	// initialise MPI
+	vector<int>	neighbors_sum(N, 0);
+
+	
+	vector<int> neighbors_part = neighbors_bruteforce(N, 8.0, positions, iproc, nproc);
+
+	MPI_Reduce(neighbors_part.data(), neighbors_sum.data(), N, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
 	// finalise MPI
+
+	// compute the min, max and average number of neighbors
+	int max, min;
+	double avg;
+	neighbor_stats(neighbors_sum, max, min, avg);
+
+	cout << "Max number of neighbors: " << max << endl;
+	cout << "Min number of neighbors: " << min << endl;
+	cout << "Average number of neighbors: " << avg << endl;
 	MPI_Finalize();
 
-	for (int i=0; i<N; i++)
-	{
-		cout << "Atom " << i << " has " << neighbors[i] << " neighbors" << endl;
-	}
-				
 	return 0;
 }
 
